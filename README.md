@@ -1,0 +1,1 @@
+# seans-homeassistant-addons
