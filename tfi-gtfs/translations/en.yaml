@@ -1,0 +1,18 @@
+---
+configuration:
+  api_key:
+    name: API Key
+    description: Primary API key from your National Transport Agency Developer Account
+
+  filter_stops:
+    name: Filter Stops
+    description: A comma-separated list of stop numbers to restrict processing to. Reduces RAM usage, but only these stops can be queried.
+  
+  log_level:
+    name: Log level
+    description: >-
+      Controls the level of log details the add-on provides.
+
+network:
+  7341/tcp: HTTP API port
+
