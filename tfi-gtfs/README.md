@@ -30,13 +30,17 @@ To show real time information in the UI for that stop, add a Markdown card like 
 
 ```yaml
 type: markdown
-title: Stop 1358 Arrivals
 entity_id: sensor.tfi_realtime_1358
 content: >-
-  {% set stop_number="1358" %}
-  {% set arrivals = state_attr('sensor.tfi_realtime_1358', stop_number)%}
+  {% set rest_sensor = "sensor.tfi_realtime_1358" %}
+  {% set stop_number = "1358" %}
+  {% set max_results = 10 %}
+  {% set arrivals = state_attr(rest_sensor, stop_number)['arrivals']%}
+  {% set stop_name = state_attr(rest_sensor, stop_number)['stop_name']%}
   
-  {% for i in range(0, min(arrivals | count, 10) ) %}
+  ## {{ stop_name }}
+  
+  {% for i in range(0, min(arrivals | count, max_results) ) %}
     {%- set live=False -%}
     {%- set arrival_time = arrivals[i]['scheduled_arrival'] | as_datetime | as_local -%}
     {%- if arrivals[i]['real_time_arrival'] -%}
@@ -57,8 +61,8 @@ content: >-
     {%- if live -%}
       {% set arrival_time = "<font color=green>" + arrival_time + "</font>" %}
     {%- endif -%}
-    {{ arrivals[i]['route'] }} {% if soon %}in{% else %}at{% endif %} {{ arrival_time }}
-  {% endfor %}  
+    {{ arrivals[i]['route'] }} to {{ arrivals[i]['headsign'] }} {% if soon %}in{% else %}at{% endif %} {{ arrival_time }}
+  {% endfor %} 
 
 ```
 
