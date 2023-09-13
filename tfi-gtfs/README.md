@@ -63,3 +63,11 @@ content: >-
 ```
 
 This card highlights real-time arrivals in green. Itshows the next 10 arrivals at the stop, with those arriving in the next 20 minutes in relative time (e.g., "in 3 mins"), and later arrivals in absolute time (e.g., "at 13:42").
+
+# Disk Space Requirements
+
+This addon requires a few hundred megabytes of disk space to run. It downloads the static GTFS zip file, which is quite large, and extracts it to the data dir. Then it processes it and stores the results in *redis*, which persists its data into a `dump.rdb` file in the data dir. The size of the *redis* file is small if you are using "filter stops", but can be over 100 megabytes if you are not filtering stops.
+
+All this data is stored in the addon's `/data` directory, which persists across restarts. This allows restarts of this addon to be pretty quick, since *tfi-gtfs* will just reload its state from the `dump.rdb` file.
+
+> Note: On Home Assistant OS, the `/data` dirs in addons can be found on the host at `/mnt/data/supervisor/addons/data/`.

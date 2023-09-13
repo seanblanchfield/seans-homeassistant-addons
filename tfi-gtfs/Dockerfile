@@ -1,6 +1,9 @@
 ARG BUILD_FROM=ghcr.io/hassio-addons/base:14.1.0
 FROM $BUILD_FROM
 
+ARG DATA_DIR=/data
+ENV DATA_DIR=${DATA_DIR}
+
 ARG SOURCE_ZIP_URL=https://github.com/seanblanchfield/tfi-gtfs/archive/refs/heads/main.zip
 
 # Install requirements for add-on
