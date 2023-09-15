@@ -10,63 +10,16 @@ In addition, you can optionally specify up to four "filter stops". You specify t
 
 # Consuming the REST API from Home Assistant
 
-There isn't currently a custom card to display the info from the API, but you can create a Markdown card that does the job.
+A custom card to display upcoming arrivals at a given stop is provided in the repository in `tfi-gtfs-card.js`.
 
-Add a [REST sensor](https://www.home-assistant.io/integrations/sensor.rest/) to `configuration.yaml` that reads the real-time data from the Add-on (replace the stop number `1358` in the URL with a stop that you're interested in):
-
-``` yaml
-rest:
-  - resource: http://localhost:7341/api/v1/arrivals?stop=1358
-    scan_interval: 60
-    sensor:
-      name: "TFI Realtime 1358"
-      unique_id: tfi_realtime_1358
-      value_template: "OK"
-      json_attributes:
-        - "1358"
-```
-
-To show real time information in the UI for that stop, add a Markdown card like the following:
+To use it, place it in your `/config/www/` directory. The contents of this directory are served under the `/local` path by your Home Assistant instance (i.e., at `http://homeassistant.local/local/`).  To register the card, include it as a resource in one of the usual ways, as described by the [resource docs](https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/).
 
 ```yaml
-type: markdown
-entity_id: sensor.tfi_realtime_1358
-content: >-
-  {% set rest_sensor = "sensor.tfi_realtime_1358" %}
-  {% set stop_number = "1358" %}
-  {% set max_results = 10 %}
-  {% set arrivals = state_attr(rest_sensor, stop_number)['arrivals']%}
-  {% set stop_name = state_attr(rest_sensor, stop_number)['stop_name']%}
-  
-  ## {{ stop_name }}
-  
-  {% for i in range(0, min(arrivals | count, max_results) ) %}
-    {%- set live=False -%}
-    {%- set arrival_time = arrivals[i]['scheduled_arrival'] | as_datetime | as_local -%}
-    {%- if arrivals[i]['real_time_arrival'] -%}
-      {%- set live=True -%}
-      {%- set arrival_time = arrivals[i]['real_time_arrival'] | as_datetime | as_local -%}
-    {%- endif -%}
-  
-    {%- set current_time=as_timestamp(now()) -%}
-    {%- set secs_to_arrival=as_timestamp(arrival_time) - current_time -%}
-    {%- set soon=False -%}
-    {%- if  secs_to_arrival < 60*20 -%}
-      {%- set soon=True -%}
-      {%- set arrival_time = (secs_to_arrival // 60)|int|string + " mins" -%}
-    {%- else -%}
-      {%- set arrival_time = arrival_time.strftime("%H:%M") -%}
-    {%- endif -%}
-    
-    {%- if live -%}
-      {% set arrival_time = "<font color=green>" + arrival_time + "</font>" %}
-    {%- endif -%}
-    {{ arrivals[i]['route'] }} to {{ arrivals[i]['headsign'] }} {% if soon %}in{% else %}at{% endif %} {{ arrival_time }}
-  {% endfor %} 
-
+- url: /local/tfi-gtfs/tfi-gtfs-card.js
+  type: module
 ```
 
-This card highlights real-time arrivals in green. Itshows the next 10 arrivals at the stop, with those arriving in the next 20 minutes in relative time (e.g., "in 3 mins"), and later arrivals in absolute time (e.g., "at 13:42").
+Do a hard reload on your web browser (I find it useful to reload with "disable cache" checked in the dev tool Network panel). You should now see a custom "*Transport for Ireland GTFS Card*" in the *Add Card* dialog. It allows you to specify a stop number, API URL, refresh interval, and maximum number of upcoming arrivals to display.
 
 # Disk Space Requirements
 
