@@ -1,6 +1,7 @@
 name: "Transport for Ireland REST API"
 description: "Home Assistant Addon that provides real-time  GTFS-R information from Transport from Ireland via a REST API"
-version: "1.0.6"
+version: "1.0.12"
+url: https://github.com/seanblanchfield/seans-homeassistant-addons/tree/main/tfi-gtfs
 slug: "tfi-gtfs"
 init: false
 webui: http://[HOST]:[PORT:7341]/api/v1/arrivals
@@ -15,11 +16,16 @@ ports:
   7341/tcp: 7341
 ports_description:
   7341/tcp: HTTP API port
+ingress: true
+ingress_port: 7341
+hassio_api: true
+homeassistant_api: true
+hassio_role: default
 options:
   api_key: null
-  filter_stops: null
+  stops: null
   log_level: INFO
 schema:
   api_key: str
-  filter_stops: str
+  stops: str
   log_level: list(DEBUG|INFO|WARNING|ERROR|CRITICAL)?

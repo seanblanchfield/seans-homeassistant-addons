@@ -1,14 +1,18 @@
 # Overview
-This addon packages up my [Transport for Ireland GTFS REST API](https://github.com/seanblanchfield/tfi-gtfs) project, which proxies *Transport for Ireland's* GTFS-R feed into an easy-to-use REST API. This REST API can then be consumed from Home Assistant to display real-time transport info (e.g., buses that will be arriving shortly) in a Lovelace card.
+This addon packages up my [Transport for Ireland GTFS REST API](https://github.com/seanblanchfield/tfi-gtfs) project, which proxies *Transport for Ireland's* GTFS-R feed into an easy-to-use REST API. Furthermore, this addon consumes that REST API and creates/updates Home Assistant entities with real-time data about each specified transport stop.
 
-See the [README](https://github.com/seanblanchfield/tfi-gtfs) file at the main project for details info on using this. 
+You can independently consume the REST API by connecting to it directly at http://homeassistant.local:7341/api/v1/arrivals. You can also click "Open Web UI" on the addon page in Home Assistant to access it at its ingress URL (note that ingress URLs expire).
+
+See the [README](https://github.com/seanblanchfield/tfi-gtfs) file at the main project for further details about this project. 
 
 # Configuration
 To use this addon you must register a free account at https://developer.nationaltransport.ie/ to obtain API keys (you just need the "primary" key). You must set these in the configuration screen after you have this addon installed.
 
-In addition, you can optionally specify up to four "filter stops". You specify these using the regular stop number that is normally printed on the bus stop. You can also see the stop numbers on the official interactive [Journey Planner Map](https://www.transportforireland.ie/plan-a-journey/).  If you specify these stops, memory consumption will be significantly reduced, but you will only be able to make queries about those stops.
+In addition, you must specify a number of transport stops that it should monitor. You specify these stops in a comma-delimited list using the regular stop number that is normally printed on the bus stop. You can also see the stop numbers on the official interactive [Journey Planner Map](https://www.transportforireland.ie/plan-a-journey/).  
 
-# Consuming the REST API from Home Assistant
+# Displaying Real-Time Arrivals in Home Assistant
+
+![](img/tfi-card.png)
 
 A custom card to display upcoming arrivals at a given stop is provided in the repository in `tfi-gtfs-card.js`.
 
@@ -23,7 +27,7 @@ Do a hard reload on your web browser (I find it useful to reload with "disable c
 
 # Disk Space Requirements
 
-This addon requires a few hundred megabytes of disk space to run. It downloads the static GTFS zip file, which is quite large, and extracts it to the data dir. Then it processes it and stores the results in *redis*, which persists its data into a `dump.rdb` file in the data dir. The size of the *redis* file is small if you are using "filter stops", but can be over 100 megabytes if you are not filtering stops.
+This addon requires a few hundred megabytes of disk space to run. It downloads the static GTFS zip file, which is quite large, and extracts it to the data dir. Then it processes it and stores the results in *redis*, which persists its data into a `dump.rdb` file in the data dir. The size of the *redis* file is small unless you specify a very long list of stops to monitor.
 
 All this data is stored in the addon's `/data` directory, which persists across restarts. This allows restarts of this addon to be pretty quick, since *tfi-gtfs* will just reload its state from the `dump.rdb` file.
 

@@ -1,12 +1,9 @@
-import {
-    LitElement,
-    html,
-    css,
-} from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-const DEFAULT_STOP_NUMBER = "1358";
-const DEFAULT_API_URL = "http://homeassistant.local:7341/api/v1/arrivals";
-const DEFAULT_REFRESH_INTERVAL = 60;
+import {LitElement, html, css } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/core/lit-core.min.js';
+
+const DEFAULT_STOP_NUMBER = "";
+const DEFAULT_API_URL = "";
+const DEFAULT_REFRESH_INTERVAL = 30;
 const DEFAULT_MAX_ARRIVALS = 10;
 
 class TfiGtfsCardEditor extends LitElement {
@@ -33,14 +30,25 @@ class TfiGtfsCardEditor extends LitElement {
         if (!this.hass || !this._config) {
           return html``;
         }
-    
+        const availableStops = Object.keys(this.hass.states).filter(key => key.startsWith("sensor.tfi_gtfs"));
         return html`
           <ha-form
             .hass=${this.hass}
             .data=${this._config}
             .schema=${[
-                {name: "stopNumber", label: "Stop Number", selector: { text: {} } },
-                {name: "apiUrl", label: "API URL", selector: { text: {type: 'url'} } },
+                {
+                    name: "stopEntity", 
+                    label: "Stop Entities", 
+                    selector: { 
+                        entity: {
+                            include_entities: availableStops
+                        } 
+                    },
+                    disabled: !! this._config.apiUrl,
+                    required: false
+                },
+                {name: "apiUrl", label: "API URL", selector: { text: {type: 'url'} }, required: false},
+                {name: "stopNumber", label: "Stop Number", selector: { text: {} }, required: false},
                 {name: "refreshInterval", label: "Refresh Interval (seconds)", selector: { text: {type: 'number'} } },
                 {name: "maxArrivals", label: "Maximum number of arrivals to show", selector: { text: {type: 'number'} } },
             ]}
@@ -65,18 +73,21 @@ class TfiGtfsCard extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
-        // Set up a timer to call refresh every 60 seconds
-        const refreshInterval = (this.config.refreshInterval || DEFAULT_REFRESH_INTERVAL) * 1000;
-        if(self.interval) {
-            clearInterval(self.interval);
+        if(! this.config.stopEntity) {
+            // Set up a timer to call refresh every 60 seconds
+            const refreshInterval = (this.config.refreshInterval || DEFAULT_REFRESH_INTERVAL) * 1000;
+            if(self.interval) {
+                clearInterval(self.interval);
+            }
+            self.interval = setInterval(() => this.refresh(), refreshInterval);
+            this.refresh();
         }
-        self.interval = setInterval(() => this.refresh(), refreshInterval);
-        this.refresh();
     }
     disconnectedCallback() {
         super.disconnectedCallback();
-        console.info("disconnectedCallback");
-        clearInterval(self.interval);
+        if(self.interval) {
+            clearInterval(self.interval);
+        }
     }
 
     async refresh() {
@@ -85,14 +96,40 @@ class TfiGtfsCard extends LitElement {
         const stopNumber = this.config.stopNumber || DEFAULT_STOP_NUMBER;
         const url = `${apiUrl}?stop=${stopNumber}`;
         const response = await fetch(url);
-        this.data = await response.json();
+        if(response.ok){
+            this.data = await response.json();
+        }
+        else {
+            console.warn(`Error fetching ${url}: ${response.status} ${response.statusText}`)
+        }
+    }
+    getArrivals() {
+        if(this.config.stopEntity) {
+            return this.hass.states[this.config.stopEntity].attributes.arrivals;
+        }
+        else if(this.data) {
+            return this.data[this.config.stopNumber].arrivals;
+        }
+        else {
+            return [];
+        }
+    }
+
+    getStopName() { 
+        if(this.config.stopEntity) {
+            return this.hass.states[this.config.stopEntity].attributes.stop_name;
+        }
+        else if(this.data) {
+            return this.data[this.config.stopNumber].stop_name;
+        }
+        else {
+            return "";
+        }
     }
 
     render() {
-        if(!this.data) {
-            return html``;
-        }
-        const {arrivals, stop_name} = this.data[this.config.stopNumber]
+        const arrivals = this.getArrivals();
+        const stop_name = this.getStopName();
         return html`
     <ha-card>
       <h2>
@@ -136,11 +173,8 @@ class TfiGtfsCard extends LitElement {
     }
 
     setConfig(config) {
-        if (!config.stopNumber) {
-            throw new Error("You need to provide a stop number.");
-        }
-        if (!config.apiUrl) {
-            throw new Error("You need to provide an API URL.");
+        if (! config.stopEntity && !(config.apiUrl && config.stopNumber)) {
+            throw new Error("You must provide either a stop entity, or an API URL and a stop number.");
         }
         this.config = config;
     }

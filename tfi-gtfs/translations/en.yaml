@@ -4,9 +4,9 @@ configuration:
     name: API Key
     description: Primary API key from your National Transport Agency Developer Account
 
-  filter_stops:
-    name: Filter Stops
-    description: A comma-separated list of stop numbers to restrict processing to. Reduces RAM usage, but only these stops can be queried.
+  stops:
+    name: Stops
+    description: A comma-separated list of stop numbers. Data pertaining to other stops will be discarded. Home Assistant sensors will be created and automatically updated for these stops.
   
   log_level:
     name: Log level
