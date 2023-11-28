@@ -139,31 +139,38 @@ class TfiGtfsCard extends LitElement {
         <tbody>
             ${
                 arrivals.slice(0, this.config.maxArrivals || DEFAULT_MAX_ARRIVALS ).map(arrival => {
-                let due = arrival.real_time_arrival ?? arrival.scheduled_arrival;
-                // parse due
-                const dueDate = new Date(due);
-                // if due is in the next 20 minutes, show minutes remaining
-                const now = new Date();
-                const minutesRemaining = Math.round((dueDate - now) / 1000 / 60);
-                if (minutesRemaining < 20) {
-                    due = `${minutesRemaining} minutes`;
-                } else {
-                    // due = dueDate.toLocaleTimeString();
-                    // format due time as HH:MM
-                    due = dueDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-                return html`
+                    let due = arrival.real_time_arrival ?? arrival.scheduled_arrival;
+                    // parse due
+                    const dueDate = new Date(due);
+                    // if due is in the next 20 minutes, show minutes remaining
+                    const now = new Date();
+                    const minutesRemaining = Math.round((dueDate - now) / 1000 / 60);
+                    if( minutesRemaining < -1 ) {
+                        return html``;
+                    }
+                    else if (minutesRemaining < 1) {
+                        due = "Due";
+                    }
+                    else if (minutesRemaining < 20) {
+                        due = `${minutesRemaining} minutes`;
+                    } 
+                    else {
+                        // due = dueDate.toLocaleTimeString();
+                        // format due time as HH:MM
+                        due = dueDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+                    return html`
 
-                <tr>
-                    <td>
-                        <span class="route-summary">
-                            <span class="route">${arrival.route}</span> to <span class="headsign">${arrival.headsign}</span>
-                        </span>
-                        <span class="agency">${arrival.agency}</span>
-                    </td>
-                    <td ?real-time=${arrival.real_time_arrival}>${due}</td>
-                </tr>
-            `;
+                    <tr>
+                        <td>
+                            <span class="route-summary">
+                                <span class="route">${arrival.route}</span> to <span class="headsign">${arrival.headsign}</span>
+                            </span>
+                            <span class="agency">${arrival.agency}</span>
+                        </td>
+                        <td ?real-time=${arrival.real_time_arrival}>${due}</td>
+                    </tr>
+                `;
                 }
             )}
             </tbody>
