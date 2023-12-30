@@ -1,6 +1,6 @@
 name: "Transport for Ireland REST API"
 description: "Home Assistant Addon that provides real-time  GTFS-R information from Transport from Ireland via a REST API"
-version: "1.0.15"
+version: "1.0.16"
 url: https://github.com/seanblanchfield/seans-homeassistant-addons/tree/main/tfi-gtfs
 slug: "tfi-gtfs"
 init: false

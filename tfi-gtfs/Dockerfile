@@ -27,7 +27,8 @@ RUN mv tfi-gtfs-main/* .
 # with this dockerfile.
 RUN rm Dockerfile
 
-RUN python3 -m pip install -r requirements.txt
+RUN python3 -m venv /app/venv
+RUN /app/venv/bin/python -m pip install -r requirements.txt
 
 # Copy data for add-on
 COPY run.sh /

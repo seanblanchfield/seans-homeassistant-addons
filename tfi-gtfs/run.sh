@@ -26,4 +26,5 @@ update_sensors() {
 
 update_sensors &
 
+source /app/venv/bin/activate
 /app/entrypoint.sh
