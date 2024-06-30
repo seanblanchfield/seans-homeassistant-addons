@@ -32,3 +32,7 @@ This addon requires a few hundred megabytes of disk space to run. It downloads t
 All this data is stored in the addon's `/data` directory, which persists across restarts. This allows restarts of this addon to be pretty quick, since *tfi-gtfs* will just reload its state from the `dump.rdb` file.
 
 > Note: On Home Assistant OS, the `/data` dirs in addons can be found on the host at `/mnt/data/supervisor/addons/data/`.
+
+# Consider joining the Dublin Smart Home mailing list
+
+There's a [Dublin Smart Home](https://groups.google.com/g/smart-home-dublin) google group. Consider joining it!
