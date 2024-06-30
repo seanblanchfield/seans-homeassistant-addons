@@ -8,7 +8,7 @@ export FILTER_STOPS="$(bashio::config 'stops')"
 
 # Create a function to periodically poll the API and update the sensor
 update_sensors() {
-    while ! nc -z localhost 7341 ; do
+    while ! nc -z 127.0.0.1 7341 ; do
         bashio::log.info "Waiting 10 seconds for GTFS server to start up..."
         sleep 10
     done
@@ -19,7 +19,7 @@ update_sensors() {
         for stop in ${FILTER_STOPS//,/ }; do 
             bashio::log.info "Querying $stop"
             py_cmd="import sys, json; attrs = json.load(sys.stdin).get('$stop', {}); print(json.dumps(dict(state='OK', attributes=attrs)))"
-            json=$(curl -s http://localhost:7341/api/v1/arrivals?stop=$stop | python3 -c "$py_cmd")
+            json=$(curl -s http://127.0.0.1:7341/api/v1/arrivals?stop=$stop | python3 -c "$py_cmd")
             curl -s -H "Authorization: Bearer $SUPERVISOR_TOKEN" -H "Content-Type: application/json" -d "$json" http://supervisor/core/api/states/sensor.tfi_gtfs_stop_$stop > /dev/null
             bashio::log.info "Updated sensor.tfi_gtfs_stop_$stop"
         done 
