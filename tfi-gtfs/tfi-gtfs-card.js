@@ -53,6 +53,9 @@ class TfiGtfsCardEditor extends LitElement {
                 {name: "filterRoutes", label: "Filter by route names (comma separeted)", selector: { text: {type: 'string'} }, required: false },
                 {name: "refreshInterval", label: "Refresh Interval (seconds)", selector: { text: {type: 'number'} } },
                 {name: "maxArrivals", label: "Maximum number of arrivals to show", selector: { text: {type: 'number'} } },
+                {name: "hideServiceProvider", label: "Hide service provider", selector: { boolean: {type: 'boolean'} }, required: false },
+                {name: "hideStopName", label: "Hide stop name", selector: { boolean: {type: 'boolean'} }, required: false },
+                {name: "iconTransport", label: "Pick your icon", selector: {icon: {placeholder: "mdi:bus"}}, required: false},
             ]}
             .computeLabel=${(schema => schema.label || schema.name)}
             @value-changed=${this.valueChanged}
@@ -149,9 +152,7 @@ class TfiGtfsCard extends LitElement {
         const stop_name = this.getStopName();
         return html`
     <ha-card>
-      <h2>
-        ${ stop_name }
-      </h2>
+    ${(!this.config.hideStopName ? html`<h2>${ stop_name }</h2>` : '')}
       <table>
         <tbody>
             ${
@@ -179,13 +180,14 @@ class TfiGtfsCard extends LitElement {
                     return html`
 
                     <tr>
-                        <td>
+                    ${this.config.iconTransport ? html`<td><ha-icon icon='${this.config.iconTransport}'/></td>` : ''}
+                        <td class="route-display">
                             <span class="route-summary">
                                 <span class="route">${arrival.route}</span> to <span class="headsign">${arrival.headsign}</span>
                             </span>
-                            <span class="agency">${arrival.agency}</span>
+                            ${!this.config.hideServiceProvider ? html`<span class="agency">${arrival.agency}</span>` : ''}
                         </td>
-                        <td ?real-time=${arrival.real_time_arrival}>${due}</td>
+                        <td class="arrival-time" ?real-time=${arrival.real_time_arrival}>${due}</td>
                     </tr>
                 `;
                 }
@@ -227,6 +229,11 @@ class TfiGtfsCard extends LitElement {
       td[real-time] {
         color: green;
       }
+      td.route-display {width: 75%;}
+      td.arrival-time {
+        text-align: right;
+        text-wrap: nowrap;
+      }
       td {
         padding: 0.2em;
       }
@@ -262,6 +269,7 @@ class TfiGtfsCard extends LitElement {
             apiUrl: DEFAULT_API_URL,
             refreshInterval: DEFAULT_REFRESH_INTERVAL,
             maxArrivals: DEFAULT_MAX_ARRIVALS,
+            iconTransport: DEFAULT_ICON,
         };
     }
 }
