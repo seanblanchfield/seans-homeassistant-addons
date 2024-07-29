@@ -49,6 +49,7 @@ class TfiGtfsCardEditor extends LitElement {
                 },
                 {name: "apiUrl", label: "API URL", selector: { text: {type: 'url'} }, required: false},
                 {name: "stopNumber", label: "Stop Number", selector: { text: {} }, required: false},
+                {name: "filterRoutes", label: "Filter by route names (comma separeted)", selector: { text: {type: 'string'} }, required: false },
                 {name: "refreshInterval", label: "Refresh Interval (seconds)", selector: { text: {type: 'number'} } },
                 {name: "maxArrivals", label: "Maximum number of arrivals to show", selector: { text: {type: 'number'} } },
             ]}
@@ -105,14 +106,26 @@ class TfiGtfsCard extends LitElement {
     }
     getArrivals() {
         if(this.config.stopEntity) {
+            if(this.config.filterRoutes) {
+                return this.filterArrivals(this.hass.states[this.config.stopEntity].attributes.arrivals, this.config.filterRoutes)
+            }
             return this.hass.states[this.config.stopEntity].attributes.arrivals;
         }
         else if(this.data) {
+            if(this.config.filterRoutes) {
+                return this.filterArrivals(this.data[this.config.stopNumber].arrivals, this.config.filterRoutes)
+            }
             return this.data[this.config.stopNumber].arrivals;
         }
         else {
             return [];
         }
+    }
+    filterArrivals(arrivals, routeNumbers) {
+        // Convert the comma-separated routeNumbers string into an array
+        const routeNumberArray = routeNumbers.split(',').map(route => route.trim());
+        // Filter the arrivals array based on the routeNumberArray
+        return arrivals.filter(arrival => routeNumberArray.includes(arrival.route));
     }
 
     getStopName() { 
