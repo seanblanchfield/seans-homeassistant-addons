@@ -107,13 +107,13 @@ class TfiGtfsCard extends LitElement {
     getArrivals() {
         if(this.config.stopEntity) {
             if(this.config.filterRoutes) {
-                return this.filterArrivals(this.hass.states[this.config.stopEntity].attributes.arrivals, this.config.filterRoutes)
+                return this.filterArrivals(this.hass.states[this.config.stopEntity].attributes.arrivals, this.config.filterRoutes);
             }
             return this.hass.states[this.config.stopEntity].attributes.arrivals;
         }
         else if(this.data) {
             if(this.config.filterRoutes) {
-                return this.filterArrivals(this.data[this.config.stopNumber].arrivals, this.config.filterRoutes)
+                return this.filterArrivals(this.data[this.config.stopNumber].arrivals, this.config.filterRoutes);
             }
             return this.data[this.config.stopNumber].arrivals;
         }
