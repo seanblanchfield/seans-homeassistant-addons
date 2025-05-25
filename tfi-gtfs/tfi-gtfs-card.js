@@ -5,6 +5,7 @@ const DEFAULT_STOP_NUMBER = "";
 const DEFAULT_API_URL = "";
 const DEFAULT_REFRESH_INTERVAL = 30;
 const DEFAULT_MAX_ARRIVALS = 10;
+const DEFAULT_ICON = "mdi:bus";
 
 class TfiGtfsCardEditor extends LitElement {
     static properties = {
