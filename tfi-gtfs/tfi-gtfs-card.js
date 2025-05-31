@@ -51,7 +51,7 @@ class TfiGtfsCardEditor extends LitElement {
                 {name: "apiUrl", label: "API URL", selector: { text: {type: 'url'} }, required: false},
                 {name: "stopNumber", label: "Stop Number", selector: { text: {} }, required: false},
                 {name: "overwriteStopName", label: "Overwrite stop name in the UI", selector: { text: {} }, required: false},
-                {name: "filterRoutes", label: "Filter by route names (comma separeted)", selector: { text: {type: 'string'} }, required: false },
+                {name: "filterRoutes", label: "Filter by route names (comma separated)", selector: { text: {type: 'string'} }, required: false },
                 {name: "refreshInterval", label: "Refresh Interval (seconds)", selector: { text: {type: 'number'} } },
                 {name: "maxArrivals", label: "Maximum number of arrivals to show", selector: { text: {type: 'number'} } },
                 {name: "hideServiceProvider", label: "Hide service provider", selector: { boolean: {type: 'boolean'} }, required: false },
