@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.21] - 2026-11-18
+
+- Update the GTFS application with lower memory usage and prevent API keys from being logged.
+- Rebuild the Redis cache when its RDB format is incompatible with the installed Redis version.
+
 ## [1.2.1] - 2023-09-01
 Modified to instead package my own implementation of a REST API that proxies *Transport for Ireland*'s GTFS-R feed - [tfi-gtfs](https://github.com/seanblanchfield/tfi-gtfs).
 

@@ -1,5 +1,7 @@
 #!/usr/bin/with-contenv bashio
 
+/check-redis-cache.sh || exit 1
+
 CONFIG_PATH=/data/options.json
 
 export API_KEY="$(bashio::config 'api_key')"
